@@ -8,22 +8,26 @@ describe('inquire-test', function() {
 
   test('press enter', async () => {
     const result = await run([cliPath], [ENTER]);
-    expect(result).toMatch(new RegExp('TEST-1', 'g'));
+    expect(result.out).toMatch(new RegExp('TEST-1', 'g'));
+    expect(result.err).toMatch(new RegExp('ERR-TEST-1', 'g'));
   });
 
   test('press down, press enter', async () => {
     const result = await run([cliPath], [DOWN, ENTER]);
-    expect(result).toMatch(new RegExp('TEST-2', 'g'));
+    expect(result.out).toMatch(new RegExp('TEST-2', 'g'));
+    expect(result.err).toMatch(new RegExp('ERR-TEST-2', 'g'));
   });
 
   test('press up, press enter', async () => {
     const result = await run([cliPath], [UP, ENTER]);
-    expect(result).toMatch(new RegExp('TEST-3', 'g'));
+    expect(result.out).toMatch(new RegExp('TEST-3', 'g'));
+    expect(result.err).toMatch(new RegExp('ERR-TEST-3', 'g'));
   });
-  
+
   test('press up, press down, press enter', async () => {
     const result = await run([cliPath], [UP, DOWN, ENTER]);
-    expect(result).toMatch(new RegExp('TEST-1', 'g'));
+    expect(result.out).toMatch(new RegExp('TEST-1', 'g'));
+    expect(result.err).toMatch(new RegExp('ERR-TEST-1', 'g'));
   });
 });
 

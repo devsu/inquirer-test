@@ -8,4 +8,5 @@ inquirer.prompt({
   choices: [ '1', '2', '3' ]
 }).then(function(answers) {
   console.log(outputs[+answers.q - 1]);
+  console.error('ERR-' + outputs[+answers.q - 1]);
 });

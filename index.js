@@ -1,9 +1,9 @@
 'use strict';
 
 var spawn = require('child_process').spawn;
-var concat = require('concat-stream');
+var concat = require('concat-stream-promise');
 
-module.exports = function(args, combo, timeout) {
+module.exports = async function(args, combo, timeout) {
   if (!timeout) {
     timeout = 200;
   }
@@ -24,11 +24,9 @@ module.exports = function(args, combo, timeout) {
 
   loop(combo);
 
-  return new Promise(function(resolve) {
-    proc.stdout.pipe(concat(function(result) {
-      resolve(result.toString());
-    }));
-  });
+  const out = (await proc.stdout.pipe(concat())).toString();
+  const err = (await proc.stderr.pipe(concat())).toString();
+  return {out, err};
 };
 
 module.exports.DOWN = '\x1B\x5B\x42';
