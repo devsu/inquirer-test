@@ -3,10 +3,15 @@
 var spawn = require('child_process').spawn;
 var concat = require('concat-stream-promise');
 
-module.exports = async function(args, combo, timeout) {
-  if (!timeout) {
-    timeout = 200;
-  }
+const ENTER = '\x0D';
+
+module.exports = async function(args, combo, options) {
+  const defaultOptions = {
+    timeout: 5,
+    enterTimeout: 10,
+  };
+  options = Object.assign({}, defaultOptions, options);
+  let nextTimeout = options.timeout;
 
   var proc = spawn('node', args, { stdio: [null, null, null] });
   proc.stdin.setEncoding('utf-8');
@@ -15,8 +20,9 @@ module.exports = async function(args, combo, timeout) {
     if (combo.length > 0) {
       setTimeout(function() {
         proc.stdin.write(combo[0]);
+        nextTimeout = combo[0] === ENTER ? options.enterTimeout : options.timeout;
         loop(combo.slice(1));
-      }, timeout);
+      }, nextTimeout);
     } else {
       proc.stdin.end();
     }
@@ -31,4 +37,4 @@ module.exports = async function(args, combo, timeout) {
 
 module.exports.DOWN = '\x1B\x5B\x42';
 module.exports.UP = '\x1B\x5B\x41';
-module.exports.ENTER = '\x0D';
+module.exports.ENTER = ENTER;
