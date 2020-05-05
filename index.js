@@ -8,10 +8,11 @@ const ENTER = '\x0D';
 module.exports = async function(args, combo, options) {
   const defaultOptions = {
     timeout: 5,
+    initialTimeout: 200,
     enterTimeout: 10,
   };
   options = Object.assign({}, defaultOptions, options);
-  let nextTimeout = options.timeout;
+  let nextTimeout = options.initialTimeout;
 
   var proc = spawn('node', args, { stdio: [null, null, null] });
   proc.stdin.setEncoding('utf-8');
