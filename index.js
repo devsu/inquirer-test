@@ -8,6 +8,7 @@ const ENTER = '\x0D';
 module.exports = async function(args, combo, options) {
   const defaultOptions = {
     waitBeforeKeystroke: 50,
+    waitAfterEnterKeystroke: 100,
     waitBeforeStart: 200,
     waitAfterDone: 200,
   };
@@ -16,26 +17,30 @@ module.exports = async function(args, combo, options) {
   var proc = spawn('node', args, { stdio: [null, null, null] });
   proc.stdin.setEncoding('utf-8');
 
-  const len = combo.length;
+  const outPromise = proc.stdout.pipe(concat());
+  const errPromise = proc.stderr.pipe(concat());
 
-  const loop = (combo, i) => {
-    let wait = options.waitBeforeKeystroke;
-    if (i === 0) wait = options.waitBeforeStart;
-    if (i === len) wait = options.waitAfterDone;
-    setTimeout(() => {
-      if (combo.length > 0) {
-        proc.stdin.write(combo[0]);
-        loop(combo.slice(1), i + 1);
-      } else {
-        proc.stdin.end();
-      }
-    }, wait);
+  const timeout = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms))
   };
 
-  loop(combo, 0);
+  const len = combo.length;
 
-  const out = (await proc.stdout.pipe(concat())).toString();
-  const err = (await proc.stderr.pipe(concat())).toString();
+  timeout(options.waitBeforeStart);
+
+  for (let i = 0; i < len; i++) {
+    timeout(options.waitBeforeKeystroke);
+    proc.stdin.write(combo[i]);
+    if (combo[i] === ENTER) timeout(options.waitAfterEnterKeystroke);
+  }
+
+  timeout(options.waitAfterDone);
+
+  const out = (await outPromise).toString();
+  const err = (await errPromise).toString();
+
+  proc.stdin.end();
+
   return {out, err};
 };
 
