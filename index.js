@@ -8,7 +8,7 @@ const ENTER = '\x0D';
 module.exports = async function(args, combo, options) {
   const defaultOptions = {
     waitBeforeKeystroke: 50,
-    waitAfterEnterKeystroke: 100,
+    waitAfterEnterKeystroke: 50,
     waitBeforeStart: 200,
     waitAfterDone: 200,
   };
@@ -26,15 +26,15 @@ module.exports = async function(args, combo, options) {
 
   const len = combo.length;
 
-  timeout(options.waitBeforeStart);
+  await timeout(options.waitBeforeStart);
 
   for (let i = 0; i < len; i++) {
-    timeout(options.waitBeforeKeystroke);
+    await timeout(options.waitBeforeKeystroke);
     proc.stdin.write(combo[i]);
-    if (combo[i] === ENTER) timeout(options.waitAfterEnterKeystroke);
+    if (combo[i] === ENTER) await timeout(options.waitAfterEnterKeystroke);
   }
 
-  timeout(options.waitAfterDone);
+  await timeout(options.waitAfterDone);
 
   const out = (await outPromise).toString();
   const err = (await errPromise).toString();
