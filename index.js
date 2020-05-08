@@ -9,8 +9,7 @@ module.exports = async function(args, combo, options) {
   const defaultOptions = {
     waitBeforeKeystroke: 50,
     waitAfterEnterKeystroke: 50,
-    waitBeforeStart: 200,
-    waitAfterDone: 200,
+    waitBeforeStart: 200
   };
   options = Object.assign({}, defaultOptions, options);
 
@@ -24,17 +23,13 @@ module.exports = async function(args, combo, options) {
     return new Promise(resolve => setTimeout(resolve, ms))
   };
 
-  const len = combo.length;
-
   await timeout(options.waitBeforeStart);
 
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < combo.length; i++) {
     await timeout(options.waitBeforeKeystroke);
     proc.stdin.write(combo[i]);
     if (combo[i] === ENTER) await timeout(options.waitAfterEnterKeystroke);
   }
-
-  await timeout(options.waitAfterDone);
 
   const out = (await outPromise).toString();
   const err = (await errPromise).toString();
