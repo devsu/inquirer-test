@@ -32,7 +32,7 @@ module.exports = async function(args, combo, options) {
     }, wait);
   };
 
-  loop(combo);
+  loop(combo, 0);
 
   const out = (await proc.stdout.pipe(concat())).toString();
   const err = (await proc.stderr.pipe(concat())).toString();
